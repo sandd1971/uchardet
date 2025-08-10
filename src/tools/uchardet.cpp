@@ -190,7 +190,10 @@ int main(int argc, char ** argv)
                         return 1;
                     }
                     *comma = '\0';
-                    uchardet_weigh_language(handle, lang_weight, strtof (comma + 1, NULL));
+                    if (strcmp (lang_weight, "*") == 0)
+                        uchardet_set_default_weight(handle, strtof (comma + 1, NULL));
+                    else
+                        uchardet_weigh_language(handle, lang_weight, strtof (comma + 1, NULL));
                 }
                 while ((lang_weight = strtok_r (NULL, ",", &saveptr)));
             }
@@ -266,6 +269,7 @@ int main(int argc, char ** argv)
             printf("%s: ", filename);
         }
         detect(handle, f, show_lang, verbose);
+        fclose(f);
     }
 
     uchardet_delete(handle);
