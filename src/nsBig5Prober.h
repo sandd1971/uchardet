@@ -44,34 +44,35 @@
 
 class nsBig5Prober: public nsCharSetProber {
 public:
-  /* TODO: replace aIsPreferredLanguage (now useless) with the new weight
-   * system.
-   */
-                  nsBig5Prober(PRBool aIsPreferredLanguage) { Reset(); }
-  virtual        ~nsBig5Prober(void)  {}
-  virtual int     GetCandidates()     { return 1;      }
-  const char     *GetCharSetName(int) { return "BIG5"; }
-  const char     *GetLanguage(int)    { return "zh";   }
-  nsProbingState  GetState(void)      { return mState; }
-
-  nsProbingState  HandleData(const char *aBuf,
-                             PRUint32    aLen,
-                             int       **codePointBuffer,
-                             int        *codePointBufferIdx);
-  void            Reset(void);
-  float           GetConfidence(int);
-  void            SetOpion() {}
+  nsBig5Prober(PRBool aIsPreferredLanguage)
+    :mIsPreferredLanguage(aIsPreferredLanguage) 
+  {mCodingSM = new nsCodingStateMachine(&Big5SMModel); 
+    Reset();}
+  virtual ~nsBig5Prober(void){delete mCodingSM;}
+  nsProbingState HandleData(const char* aBuf, PRUint32 aLen,
+                            int** codePointBuffer,
+                            int*  codePointBufferIdx);
+  virtual int GetCandidates() { return 1; }
+  const char* GetCharSetName(int) {return "BIG5";}
+  const char* GetLanguage(int) {return "zh";}
+  nsProbingState GetState(void) {return mState;}
+  void      Reset(void);
+  float     GetConfidence(int);
+  void      SetOpion() {}
 
 protected:
+  void      GetDistribution(PRUint32 aCharLen, const char* aStr);
+  
+  nsCodingStateMachine* mCodingSM;
   nsProbingState mState;
-  PRBool         isFirstByte;
-  unsigned char  firstByte;
-  PRUint32       symbolCount;
-  PRUint32       asciiLetterCount;
-  PRUint32       graphCharCount;
-  PRUint32       freqCharCount;
-  PRUint32       reservedCount;
-  PRUint32       rareCharCount;
+
+  //Big5ContextAnalysis mContextAnalyser;
+  Big5DistributionAnalysis mDistributionAnalyser;
+  char mLastChar[2];
+  PRBool mIsPreferredLanguage;
+
 };
 
+
 #endif /* nsBig5Prober_h__ */
+
