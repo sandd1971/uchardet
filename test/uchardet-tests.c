@@ -202,9 +202,9 @@ main(int argc, char ** argv)
         {
             size_t candidate_len;
 
-            candidate_len = snprintf(candidate_str, 0, "%d", expected_candidate + 1);
+            candidate_len = snprintf(candidate_str, 0, "%ld", expected_candidate + 1);
             candidate_str = malloc(candidate_len + 1);
-            snprintf(candidate_str, candidate_len + 1, "%d", expected_candidate + 1);
+            snprintf(candidate_str, candidate_len + 1, "%ld", expected_candidate + 1);
         }
 
         fprintf(stderr,

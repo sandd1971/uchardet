@@ -129,6 +129,21 @@ UCHARDET_INTERFACE void         uchardet_weigh_language     (uchardet_t  ud,
 UCHARDET_INTERFACE void         uchardet_set_default_weight (uchardet_t  ud,
                                                              float       weight);
 
+/**
+ * Exclude UTF-8 from detection results.
+ * When enabled, any UTF-8 candidates (including shortcut/BOM-based reports)
+ * will be filtered out from the candidate list and never returned as best
+ * encoding.
+ *
+ * This is useful when the caller wants to avoid false positives where non
+ * UTF-8 encodings mimic UTF-8 byte patterns.
+ *
+ * @param ud [in] handle of an instance of uchardet
+ * @param exclude_utf8 [in] non-zero to exclude UTF-8, zero to include
+ */
+UCHARDET_INTERFACE void         uchardet_set_exclude_utf8   (uchardet_t  ud,
+                                                             int         exclude_utf8);
+
 #ifdef __cplusplus
 }
 #endif

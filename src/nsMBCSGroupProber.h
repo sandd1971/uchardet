@@ -56,7 +56,7 @@
 
 class nsMBCSGroupProber: public nsCharSetProber {
 public:
-  nsMBCSGroupProber(PRUint32 aLanguageFilter);
+  nsMBCSGroupProber(PRUint32 aLanguageFilter, PRBool aExcludeUTF8);
   virtual ~nsMBCSGroupProber();
   nsProbingState HandleData(const char* aBuf, PRUint32 aLen,
                             int** codePointBuffer,

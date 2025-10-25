@@ -67,6 +67,7 @@ public:
    virtual ~nsUniversalDetector();
    virtual nsresult HandleData(const char* aBuf, PRUint32 aLen);
    virtual void DataEnd(void);
+   void SetExcludeUTF8(PRBool exclude) { mExcludeUTF8 = exclude; }
 
 protected:
    virtual void Report(const char *encoding,
@@ -89,6 +90,8 @@ protected:
 
    nsCharSetProber  *mCharSetProbers[NUM_OF_CHARSET_PROBERS];
    nsCharSetProber  *mEscCharSetProber;
+
+   PRBool mExcludeUTF8;
 };
 
 #endif

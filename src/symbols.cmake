@@ -12,6 +12,7 @@ set(
     uchardet_get_language
     uchardet_set_default_weight
     uchardet_weigh_language
+	uchardet_set_exclude_utf8
 )
 
 set (LINK_FLAGS "")

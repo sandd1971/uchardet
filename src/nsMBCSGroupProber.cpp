@@ -57,7 +57,7 @@ const char *ProberName[] =
 
 #endif
 
-nsMBCSGroupProber::nsMBCSGroupProber(PRUint32 aLanguageFilter)
+nsMBCSGroupProber::nsMBCSGroupProber(PRUint32 aLanguageFilter, PRBool aExcludeUTF8)
 {
   for (PRUint32 i = 0; i < NUM_OF_PROBERS; i++)
   {
@@ -67,7 +67,11 @@ nsMBCSGroupProber::nsMBCSGroupProber(PRUint32 aLanguageFilter)
     codePointBufferIdx[i]  = 0;
   }
 
-  mProbers[0] = new nsUTF8Prober();
+  // Optionally exclude UTF-8 prober entirely
+  if (!aExcludeUTF8)
+    mProbers[0] = new nsUTF8Prober();
+  else
+    mProbers[0] = nsnull;
   if (aLanguageFilter & NS_FILTER_JAPANESE) 
   {
     mProbers[1] = new nsSJISProber(aLanguageFilter == NS_FILTER_JAPANESE);
@@ -88,7 +92,7 @@ nsMBCSGroupProber::nsMBCSGroupProber(PRUint32 aLanguageFilter)
 
   for (PRUint32 i = 0; i < NUM_OF_PROBERS; i++)
   {
-    if (mProbers[i]->DecodeToUnicode())
+    if (mProbers[i] && mProbers[i]->DecodeToUnicode())
     {
       int j = 0;
 
@@ -276,7 +280,7 @@ nsProbingState nsMBCSGroupProber::HandleData(const char* aBuf, PRUint32 aLen,
                                              int** cpBuffer,
                                              int*  cpBufferIdx)
 {
-  nsProbingState st;
+  nsProbingState st = eDetecting;
   PRUint32 start = 0;
   PRUint32 keepNext = mKeepNext;
 

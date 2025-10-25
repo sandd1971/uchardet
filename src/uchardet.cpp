@@ -57,10 +57,11 @@ protected:
     std::vector<UChardetCandidate> weighed_candidates;
     std::map<std::string, float> weights;
     float default_weight;
+    bool  exclude_utf8;
 
 public:
     HandleUniversalDetector()
-    : nsUniversalDetector(NS_FILTER_ALL), default_weight(1.0)
+    : nsUniversalDetector(NS_FILTER_ALL), default_weight(1.0), exclude_utf8(false)
     {
     }
 
@@ -73,6 +74,16 @@ public:
                         const char *language,
                         float       confidence)
     {
+        // Optionally exclude UTF-8 from results entirely
+        if (exclude_utf8 && encoding)
+        {
+            if (strcmp(encoding, "UTF-8") == 0 || strcmp(encoding, "utf-8") == 0 ||
+                strcmp(encoding, "UTF8")  == 0 || strcmp(encoding, "utf8")  == 0)
+            {
+                return;
+            }
+        }
+
         std::vector<UChardetCandidate>::iterator it;
         UChardetCandidate                        candidate;
 
@@ -163,6 +174,12 @@ public:
     {
         default_weight = weight;
         WeighCandidates();
+    }
+
+    void SetExcludeUTF8Public(bool exclude)
+    {
+        exclude_utf8 = exclude;
+        SetExcludeUTF8(exclude);
     }
 
 private:
@@ -271,4 +288,12 @@ void uchardet_set_default_weight (uchardet_t  ud,
                                   float       weight)
 {
     reinterpret_cast<HandleUniversalDetector*>(ud)->WeighDefault(weight);
+}
+
+void uchardet_set_exclude_utf8 (uchardet_t  ud,
+                                int         exclude_utf8)
+{
+    if (!ud) return;
+    HandleUniversalDetector* h = reinterpret_cast<HandleUniversalDetector*>(ud);
+    h->SetExcludeUTF8Public(exclude_utf8 != 0);
 }

@@ -58,6 +58,7 @@ nsUniversalDetector::nsUniversalDetector(PRUint32 aLanguageFilter)
   mInputState = ePureAscii;
   mLastChar = '\0';
   mLanguageFilter = aLanguageFilter;
+  mExcludeUTF8 = PR_FALSE;
 
   shortcutCharset = nullptr;
   shortcutLanguage = nullptr;
@@ -126,8 +127,10 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
           if (('\xBB' == aBuf[1]) && ('\xBF' == aBuf[2]))
           {
             /* EF BB BF: UTF-8 encoded BOM. */
-            shortcutCharset = "UTF-8";
-            shortcutConfidence = 0.99;
+            if (!mExcludeUTF8) {
+              shortcutCharset = "UTF-8";
+              shortcutConfidence = 0.99;
+            }
           }
         break;
         case '\xFE':
@@ -202,7 +205,7 @@ nsresult nsUniversalDetector::HandleData(const char* aBuf, PRUint32 aLen)
         //start multibyte and singlebyte charset prober
         if (nsnull == mCharSetProbers[0])
         {
-          mCharSetProbers[0] = new nsMBCSGroupProber(mLanguageFilter);
+          mCharSetProbers[0] = new nsMBCSGroupProber(mLanguageFilter, mExcludeUTF8);
           if (nsnull == mCharSetProbers[0])
             return NS_ERROR_OUT_OF_MEMORY;
         }
